@@ -1,0 +1,23 @@
+.header {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+}
+
+.nav-link {
+    font-size: 1.1rem;
+    color: #007bff !important;
+    padding: 0.5rem 1rem;
+}
+
+.nav-link:hover {
+    background-color: #e9ecef;
+    border-radius: 4px;
+}
+
+h1 {
+    font-weight: 600;
+}
+
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+}
