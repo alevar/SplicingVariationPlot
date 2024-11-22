@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-import { Transcriptome, BedFile } from '../../../../types/api';
+import { Transcriptome, BedFile } from 'sparrowgenomelib';
 import { SplicePlot } from './SplicePlot';
 
 interface SplicePlotWrapperProps {

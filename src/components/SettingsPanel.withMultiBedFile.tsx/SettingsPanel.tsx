@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Col, Row, Form, Button } from "react-bootstrap";
 import "./SettingsPanel.css";
-import { BedFile } from "../../../../types/api";
+import { BedFile } from "sparrowgenomelib";
 
 interface SettingsPanelProps {
     onGTFUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;

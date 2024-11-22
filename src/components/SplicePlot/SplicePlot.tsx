@@ -5,9 +5,7 @@ import {
     BedFile,
     BedData,
     D3Grid,
-    GridConfig
-} from '../../types/api';
-import {
+    GridConfig,
     ORFPlot,
     TranscriptomePlot,
     TranscriptomePlotLabels,
@@ -15,7 +13,7 @@ import {
     LinePlot,
     DataPlotArray,
     TriangleConnector
-} from '../../utils/plots';
+} from 'sparrowgenomelib';
 
 interface SplicePlotData {
     transcriptome: Transcriptome;

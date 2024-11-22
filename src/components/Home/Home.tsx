@@ -6,8 +6,7 @@ import SettingsPanel from "../SettingsPanel/SettingsPanel";
 import ErrorModal from "../ErrorModal/ErrorModal";
 import SplicePlotWrapper from "../SplicePlot/SplicePlotWrapper";
 
-import { parseBed } from "../../utils/Parsers/Parsers";
-import { BedFile, BedData, Transcriptome } from "../../types/api";
+import { parseBed, BedFile, BedData, Transcriptome } from 'sparrowgenomelib';
 
 const Home: React.FC = () => {
     const [transcriptome, setTranscriptome] = useState<Transcriptome>(new Transcriptome());
