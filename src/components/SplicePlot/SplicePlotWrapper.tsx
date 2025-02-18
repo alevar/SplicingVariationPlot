@@ -1,12 +1,13 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-import { Transcriptome, BedFile } from 'sparrowgenomelib';
+import { Transcriptome, SJFile, BedFile } from 'sparrowgenomelib';
 import { SplicePlot } from './SplicePlot';
 
 interface SplicePlotWrapperProps {
     transcriptome: Transcriptome;
-    bedFiles: {donors: BedFile, acceptors: BedFile};
+    conservationBedFile: BedFile;
+    sjFiles: {donors: SJFile, acceptors: SJFile};
     zoomWidth: number;
     zoomWindowWidth: number;
     width: number;
@@ -15,8 +16,9 @@ interface SplicePlotWrapperProps {
 }
 
 const SplicePlotWrapper: React.FC<SplicePlotWrapperProps> = ({ 
-    transcriptome, 
-    bedFiles, 
+    transcriptome,
+    conservationBedFile,
+    sjFiles: sjFiles, 
     zoomWidth, 
     zoomWindowWidth,
     width, 
@@ -48,15 +50,16 @@ const SplicePlotWrapper: React.FC<SplicePlotWrapperProps> = ({
         svg.selectAll("*").remove();
         
         const splicePlot = new SplicePlot(svg, { 
-            transcriptome, 
-            bedFiles, 
+            transcriptome,
+            conservationBedFile,
+            sjFiles: sjFiles, 
             zoomWidth, 
             zoomWindowWidth,
             width, 
             height, 
             fontSize });
         splicePlot.plot();
-    }, [transcriptome, bedFiles, zoomWidth, zoomWindowWidth, width, height, fontSize]);
+    }, [transcriptome, conservationBedFile, sjFiles, zoomWidth, zoomWindowWidth, width, height, fontSize]);
 
     return (
         <div>

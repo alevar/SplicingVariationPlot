@@ -5,9 +5,11 @@ import "./SettingsPanel.css";
 interface SettingsPanelProps {
     gtfStatus: number;
     onGTFUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    conservationStatus: number;
+    onConservationBedUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
     donorsStatus: number;
     acceptorsStatus: number;
-    onBEDUpload: (type: 'donors' | 'acceptors', event: React.ChangeEvent<HTMLInputElement>) => void;
+    onSJUpload: (type: 'donors' | 'acceptors', event: React.ChangeEvent<HTMLInputElement>) => void;
     zoomWidth: number;
     onZoomWidthChange: (value: number) => void;
     zoomWindowWidth: number;
@@ -23,9 +25,11 @@ interface SettingsPanelProps {
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
     gtfStatus,
     onGTFUpload,
+    conservationStatus,
+    onConservationBedUpload,
     donorsStatus,
     acceptorsStatus,
-    onBEDUpload,
+    onSJUpload,
     zoomWidth,
     onZoomWidthChange,
     zoomWindowWidth,
@@ -52,17 +56,26 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                             )}
                         </Form.Group>
 
-                        <Form.Group controlId="donorsBedUpload">
-                            <Form.Label>Donors BED</Form.Label>
-                            <Form.Control type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => onBEDUpload("donors", e)} />
+                        {/* Conservation Bed Upload */}
+                        <Form.Group controlId="conservationBedUpload">
+                            <Form.Label>Conservation BED</Form.Label>
+                            <Form.Control type="file" onChange={onConservationBedUpload} />
+                            {conservationStatus === -1 && (
+                                <div className="text-danger">Error parsing conservation file</div>
+                            )}
+                        </Form.Group>
+
+                        <Form.Group controlId="donorsSJUpload">
+                            <Form.Label>Donors SJ</Form.Label>
+                            <Form.Control type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSJUpload("donors", e)} />
                             {donorsStatus === -1 && (
                                 <div className="text-danger">Error parsing donors file</div>
                             )}
                         </Form.Group>
 
-                        <Form.Group controlId="acceptorsBedUpload">
-                            <Form.Label>acceptorsBedUpload</Form.Label>
-                            <Form.Control type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => onBEDUpload("acceptors", e)} />
+                        <Form.Group controlId="acceptorsSJUpload">
+                            <Form.Label>Acceptors SJ</Form.Label>
+                            <Form.Control type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSJUpload("acceptors", e)} />
                             {acceptorsStatus === -1 && (
                                 <div className="text-danger">Error parsing acceptors file</div>
                             )}
