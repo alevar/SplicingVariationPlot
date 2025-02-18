@@ -83,7 +83,7 @@ export class SequenceLogo {
 
         // Add the letter with vertical scaling only
         letterGroup.append('text')
-            .attr('text-anchor', 'middle')
+            .attr('text-anchor', 'bottom')
             .attr('dominant-baseline', 'hanging')
             .attr('fill', this.colors[nuc])
             .attr('font-family', 'monospace')
@@ -133,6 +133,7 @@ export class SequenceLogo {
             const relativeHeights = this.calculateRelativeHeights(counts);
             
             let yOffset = this.dimensions.height;
+            console.log(yOffset);
 
             // Draw letters in fixed order (A, C, G, T, N)
             nucleotideOrder.forEach(nuc => {
