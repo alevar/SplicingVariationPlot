@@ -53,3 +53,25 @@
     align-items: center;
     margin-top: 5px;
 }
+
+.persistent-tooltip {
+    pointer-events: auto !important;
+  }
+  
+  .custom-tooltip {
+    max-width: 400px;
+    background-color: #000;
+    color: #fff;
+    text-align: left;
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .custom-tooltip pre {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 8px;
+  }
