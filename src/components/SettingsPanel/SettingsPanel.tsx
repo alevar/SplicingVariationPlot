@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import { Card, Form, OverlayTrigger, Overlay, Button, Tooltip } from "react-bootstrap";
+import { Card, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { InfoCircle } from "react-bootstrap-icons";
 import "./SettingsPanel.css";
 
 interface SettingsPanelProps {
     gtfStatus: number;
     onGTFUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    conservationStatus: number;
-    onConservationBedUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
     donorsStatus: number;
     acceptorsStatus: number;
-    onSJUpload: (type: 'donors' | 'acceptors', event: React.ChangeEvent<HTMLInputElement>) => void;
+    onBEDUpload: (type: 'donors' | 'acceptors', event: React.ChangeEvent<HTMLInputElement>) => void;
     zoomWidth: number;
     onZoomWidthChange: (value: number) => void;
     zoomWindowWidth: number;
@@ -26,11 +24,9 @@ interface SettingsPanelProps {
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
     gtfStatus,
     onGTFUpload,
-    conservationStatus,
-    onConservationBedUpload,
     donorsStatus,
     acceptorsStatus,
-    onSJUpload,
+    onBEDUpload,
     zoomWidth,
     onZoomWidthChange,
     zoomWindowWidth,
@@ -52,16 +48,6 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                         'chr1\tVIRUS\tCDS\t1050\t1150\t.\t+\t0\tgene_id "gene1"; transcript_id "transcript1";'}
                 </pre>
                 <div>GTF files contain gene annotations with 9 tab-separated columns.</div>
-            </Tooltip>
-        ),
-        conservation: (
-            <Tooltip id="conservation-tooltip" className="tooltip-hover">
-                <strong>Conservation BED File Example:</strong>
-                <pre style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>
-                    {'K03455.1\t0\t1\t-\t350\t+\n' +
-                     'K03455.1\t1\t2\t-\t365\t+'}
-                </pre>
-                <div>BED files contain genomic regions with conservation scores.</div>
             </Tooltip>
         ),
         donors: (
@@ -152,21 +138,11 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                             tooltipContent={tooltips.gtf}
                         />
 
-                        {/* Conservation BED Upload with help tooltip */}
-                        <UploadFieldWithHelp
-                            id="conservationBedUpload"
-                            label="Conservation BED"
-                            onChange={onConservationBedUpload}
-                            errorStatus={conservationStatus}
-                            errorMessage="Error parsing conservation file"
-                            tooltipContent={tooltips.conservation}
-                        />
-
                         {/* Donors SJ Upload with help tooltip */}
                         <UploadFieldWithHelp
-                            id="donorsSJUpload"
-                            label="Donors SJ"
-                            onChange={(e) => onSJUpload("donors", e)}
+                            id="donorsBedUpload"
+                            label="Donors BED"
+                            onChange={(e) => onBEDUpload("donors", e)}
                             errorStatus={donorsStatus}
                             errorMessage="Error parsing donors file"
                             tooltipContent={tooltips.donors}
@@ -174,9 +150,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
                         {/* Acceptors SJ Upload with help tooltip */}
                         <UploadFieldWithHelp
-                            id="acceptorsSJUpload"
-                            label="Acceptors SJ"
-                            onChange={(e) => onSJUpload("acceptors", e)}
+                            id="acceptorsBedUpload"
+                            label="Acceptors BED"
+                            onChange={(e) => onBEDUpload("acceptors", e)}
                             errorStatus={acceptorsStatus}
                             errorMessage="Error parsing acceptors file"
                             tooltipContent={tooltips.acceptors}
