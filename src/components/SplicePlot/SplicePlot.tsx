@@ -2,8 +2,6 @@ import * as d3 from 'd3';
 
 import {
     Transcriptome,
-    SJFile,
-    SJData,
     BedFile,
     BedData,
     D3Grid,
@@ -197,15 +195,14 @@ export class SplicePlot {
                 .domain([0, this.transcriptome.getEnd()])
                 .range([0, donor_fullGenomePlotDimensions.width]);
 
-            // TODO!
-            // const donor_fullGenomePlot = new BarPlot(donor_fullGenomePlotSvg, {
-            //     dimensions: donor_fullGenomePlotDimensions,
-            //     bedData: this.conservationBedFile.data,
-            //     xScale: xScale,
-            //     color: "#F78154"
-            // });
-            // this.grid.setCellData(0, 3, donor_fullGenomePlot);
-            // donor_fullGenomePlot.plot();
+            const donor_fullGenomePlot = new BarPlot(donor_fullGenomePlotSvg, {
+                dimensions: donor_fullGenomePlotDimensions,
+                bedData: this.bedFiles.donors.data,
+                xScale: xScale,
+                color: "#F78154"
+            });
+            this.grid.setCellData(0, 3, donor_fullGenomePlot);
+            donor_fullGenomePlot.plot();
         }
 
         const donor_dataPlotArraySvg = this.grid.getCellSvg(0, 5);
@@ -332,20 +329,19 @@ if (donor_dataPlotArraySvg) {
                 fontSize: this.fontSize,
             };
 
-            // TODO!
-            // // Create the x-axis scale
-            // const xScale = d3.scaleLinear()
-            //     .domain([0, this.transcriptome.getEnd()])
-            //     .range([0, acceptor_fullGenomePlotDimensions.width]);
+            // Create the x-axis scale
+            const xScale = d3.scaleLinear()
+                .domain([0, this.transcriptome.getEnd()])
+                .range([0, acceptor_fullGenomePlotDimensions.width]);
 
-            // const acceptor_fullGenomePlot = new BarPlot(acceptor_fullGenomePlotSvg, {
-            //     dimensions: acceptor_fullGenomePlotDimensions,
-            //     bedData: this.conservationBedFile.data,
-            //     xScale: xScale,
-            //     color: "#5FAD56"
-            // });
-            // this.grid.setCellData(0, 7, acceptor_fullGenomePlot);
-            // acceptor_fullGenomePlot.plot();
+            const acceptor_fullGenomePlot = new BarPlot(acceptor_fullGenomePlotSvg, {
+                dimensions: acceptor_fullGenomePlotDimensions,
+                bedData: this.bedFiles.acceptors.data,
+                xScale: xScale,
+                color: "#5FAD56"
+            });
+            this.grid.setCellData(0, 3, acceptor_fullGenomePlot);
+            acceptor_fullGenomePlot.plot();
         }
 
         const acceptor_dataPlotArraySvg = this.grid.getCellSvg(0, 9);
