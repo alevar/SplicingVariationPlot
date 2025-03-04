@@ -11,12 +11,10 @@ import {
     TranscriptomePlot,
     TranscriptomePlotLabels,
     BarPlot,
-    LinePlot,
+    BoxPlot,
     DataPlotArray,
     TriangleConnector
 } from 'sparrowgenomelib';
-
-import { BoxPlot } from './BoxPlot';
 
 function computeMaxNonOutlierScore(bedData: BedData): number {
     const exploded = bedData.explode(); // Each base as its own BedLine
