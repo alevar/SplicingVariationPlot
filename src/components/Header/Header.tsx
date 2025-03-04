@@ -18,7 +18,7 @@ const Header: React.FC = () => {
                 <Container>
                     <Row className="align-items-center">
                         <Col md={4}>
-                            <Link to="/" className="d-flex align-items-center">
+                            <Link to="https://alevar.github.io" className="d-flex align-items-center">
                                 <div>
                                     <img src={sparrow_logo} alt="Ales Varabyou Logo" style={{ height: '80px', marginRight: '15px' }} />
                                 </div>
@@ -29,13 +29,10 @@ const Header: React.FC = () => {
                         <Col md={7} className="text-end">
                             <Nav className="justify-content-end">
                                 <Nav.Item>
-                                    <Link to="/projects" className="nav-link">Projects</Link>
+                                    <Link to="https://alevar.github.io/homepage/#/projects" className="nav-link">Projects</Link>
                                 </Nav.Item>
                                 <Nav.Item>
                                     <Link to="/about" className="nav-link">About</Link>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Link to="/contact" className="nav-link">Contact</Link>
                                 </Nav.Item>
                             </Nav>
                         </Col>
