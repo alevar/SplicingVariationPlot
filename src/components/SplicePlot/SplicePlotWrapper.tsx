@@ -91,6 +91,8 @@ const SplicePlotWrapper: React.FC<SplicePlotWrapperProps> = ({
         if (!svgRef.current) return;
         const svg = d3.select(svgRef.current);
         svg.selectAll("*").remove();
+
+        console.log("bedFiles", bedFiles);
         
         const splicePlot = new SplicePlot(svg, { 
             transcriptome,

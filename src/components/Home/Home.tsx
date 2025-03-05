@@ -56,6 +56,7 @@ const Home: React.FC = () => {
                 setErrorModalVisible(true);
             }
         }
+        console.log("bedFiles1", bedFiles);
     };
 
     const closeErrorModal = () => {

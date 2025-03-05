@@ -16,6 +16,40 @@ import {
     TriangleConnector
 } from 'sparrowgenomelib';
 
+function computeMeanScores(bedData: BedData): BedData {
+    // Step 1: Explode the data into individual base-pair intervals
+    const explodedData = bedData.explode().getData();
+
+    // Step 2: Create a map to group scores by position
+    const scoreMap: Map<number, { totalScore: number; count: number }> = new Map();
+
+    explodedData.forEach(line => {
+        const pos = line.start;
+        if (!scoreMap.has(pos)) {
+            scoreMap.set(pos, { totalScore: 0, count: 0 });
+        }
+        const entry = scoreMap.get(pos)!;
+        entry.totalScore += line.score;
+        entry.count += 1;
+    });
+
+    // Step 3: Create a new BedData object with mean scores
+    const meanData = new BedData();
+
+    for (const [pos, { totalScore, count }] of scoreMap.entries()) {
+        meanData.addLine({
+            seqid: "mean", // Use a placeholder name for seqid
+            start: pos,
+            end: pos + 1, // Single base-pair interval
+            name: `mean@${pos}`, // Placeholder name
+            score: totalScore / count,
+            strand: ".", // Placeholder strand
+        });
+    }
+
+    return meanData;
+}
+
 function computeMaxNonOutlierScore(bedData: BedData): number {
     const exploded = bedData.explode(); // Each base as its own BedLine
     const groupedScores: { [key: number]: number[] } = {};
@@ -125,11 +159,10 @@ export class SplicePlot {
 
     private gridConfig: GridConfig = {
         columns: 3,
-        columnRatios: [0.8, 0.1, 0.1], // plot, labels, legend
+        columnRatios: [0.9, 0.1], // plot, labels, legend
         rowRatiosPerColumn: [
             [0.1, 0.45, 0.025, 0.05, 0.025, 0.15, 0.025, 0.05, 0.025, 0.15], // pathogen, transcriptome, spacer, donor fullgenome barplot, spacer, donor expression, spacer, acceptor fullgenome barplot, spacer, acceptor expression
             [0.1, 0.45, 0.025, 0.05, 0.025, 0.15, 0.025, 0.05, 0.025, 0.15], // pathogen, transcriptome, spacer, donor fullgenome barplot, spacer, donor expression, spacer, acceptor fullgenome barplot, spacer, acceptor expression
-            [1], // 1 row: legend
         ],
     };
     private grid: D3Grid;
@@ -273,14 +306,39 @@ export class SplicePlot {
                 .domain([0, this.transcriptome.getEnd()])
                 .range([0, donor_fullGenomePlotDimensions.width]);
 
+            // transform data into means
+            const donor_fullGenomeMeanData = computeMeanScores(this.bedFiles.donors.data);
             const donor_fullGenomePlot = new BarPlot(donor_fullGenomePlotSvg, {
                 dimensions: donor_fullGenomePlotDimensions,
-                bedData: this.bedFiles.donors.data,
+                bedData: donor_fullGenomeMeanData,
                 xScale: xScale,
                 color: "#F78154"
             });
             this.grid.setCellData(0, 3, donor_fullGenomePlot);
             donor_fullGenomePlot.plot();
+
+            // Add y-axis to the donor barplot in the second column
+            const donor_barplot_axis_svg = this.grid.getCellSvg(1, 3);
+            if (donor_barplot_axis_svg) {
+                const axisDimensions = this.grid.getCellDimensions(1, 3);
+                
+                // Create y-axis scale for donor barplot
+                const maxDonorScore = Math.max(...donor_fullGenomeMeanData.getData().map(d => d.score));
+                const yScale = d3.scaleLinear()
+                    .domain([0, maxDonorScore])
+                    .range([axisDimensions?.height || 0, 0]);
+                
+                // Add y-axis
+                const yAxis = d3.axisRight(yScale)
+                    .ticks(2)
+                    .tickSize(3);
+                
+                donor_barplot_axis_svg.append("g")
+                    .attr("class", "y-axis")
+                    .style("font-size", `${this.fontSize}px`)
+                    .style("color", "#333")
+                    .call(yAxis);
+            }
         }
 
         const donor_dataPlotArraySvg = this.grid.getCellSvg(0, 5);
@@ -363,6 +421,12 @@ export class SplicePlot {
                         xScale: xScale,
                         yScale: yScale,
                         showOutliers: false,
+                        colors: {
+                            box: "#F78154",
+                            median: "black",
+                            whisker: "black",
+                            outlier: "black",
+                        }
                     });
 
                     boxPlot.plot();
@@ -396,6 +460,29 @@ export class SplicePlot {
                     }
                 }
             }
+
+            // Add y-axis for each donor boxplot
+            const donor_boxplot_axis_svg = this.grid.getCellSvg(1, 5);
+            if (donor_boxplot_axis_svg && donor_positions.length > 0) {
+                const axisDimensions = this.grid.getCellDimensions(1, 5);
+                const donorsMaxYScale = computeMaxNonOutlierScore(this.bedFiles.donors.data);
+                
+                // Create y-axis scale
+                const yScale = d3.scaleLinear()
+                    .domain([0, donorsMaxYScale])
+                    .range([axisDimensions?.height || 0, 0]);
+                
+                // Add y-axis
+                const yAxis = d3.axisRight(yScale)
+                    .ticks(5)
+                    .tickSize(3);
+                
+                donor_boxplot_axis_svg.append("g")
+                    .attr("class", "y-axis")
+                    .style("font-size", `${this.fontSize}px`)
+                    .style("color", "#333")
+                    .call(yAxis);
+            }
         }
 
         // ================ ACCEPTOR ARRAY PLOTS ================
@@ -418,14 +505,39 @@ export class SplicePlot {
                 .domain([0, this.transcriptome.getEnd()])
                 .range([0, acceptor_fullGenomePlotDimensions.width]);
 
+            // transform data into means
+            const acceptor_fullGenomeMeanData = computeMeanScores(this.bedFiles.acceptors.data);
             const acceptor_fullGenomePlot = new BarPlot(acceptor_fullGenomePlotSvg, {
                 dimensions: acceptor_fullGenomePlotDimensions,
-                bedData: this.bedFiles.acceptors.data,
+                bedData: acceptor_fullGenomeMeanData,
                 xScale: xScale,
                 color: "#5FAD56"
             });
             this.grid.setCellData(0, 3, acceptor_fullGenomePlot);
             acceptor_fullGenomePlot.plot();
+
+            // Add y-axis to the acceptor barplot in the second column
+            const acceptor_barplot_axis_svg = this.grid.getCellSvg(1, 7);
+            if (acceptor_barplot_axis_svg) {
+                const axisDimensions = this.grid.getCellDimensions(1, 7);
+                
+                // Create y-axis scale for acceptor barplot
+                const maxAcceptorScore = Math.max(...acceptor_fullGenomeMeanData.getData().map(d => d.score));
+                const yScale = d3.scaleLinear()
+                    .domain([0, maxAcceptorScore])
+                    .range([axisDimensions?.height || 0, 0]);
+                
+                // Add y-axis
+                const yAxis = d3.axisRight(yScale)
+                    .ticks(3)
+                    .tickSize(3);
+                
+                acceptor_barplot_axis_svg.append("g")
+                    .attr("class", "y-axis")
+                    .style("font-size", `${this.fontSize}px`)
+                    .style("color", "#333")
+                    .call(yAxis);
+            }
         }
 
         const acceptor_dataPlotArraySvg = this.grid.getCellSvg(0, 9);
@@ -505,6 +617,12 @@ export class SplicePlot {
                         xScale: xScale,
                         yScale: yScale,
                         showOutliers: false,
+                        colors: {
+                            box: "#5FAD56",
+                            median: "black",
+                            whisker: "black",
+                            outlier: "black",
+                        }
                     });
 
                     boxPlot.plot();
@@ -537,6 +655,28 @@ export class SplicePlot {
                         acceptor_spacerPlot.plot();
                     }
                 }
+            }
+            // Add y-axis for each acceptor boxplot
+            const acceptor_boxplot_axis_svg = this.grid.getCellSvg(1, 9);
+            if (acceptor_boxplot_axis_svg && acceptor_positions.length > 0) {
+                const axisDimensions = this.grid.getCellDimensions(1, 9);
+                const acceptorsMaxYScale = computeMaxNonOutlierScore(this.bedFiles.acceptors.data);
+                
+                // Create y-axis scale
+                const yScale = d3.scaleLinear()
+                    .domain([0, acceptorsMaxYScale])
+                    .range([axisDimensions?.height || 0, 0]);
+                
+                // Add y-axis
+                const yAxis = d3.axisRight(yScale)
+                    .ticks(5)
+                    .tickSize(3);
+                
+                acceptor_boxplot_axis_svg.append("g")
+                    .attr("class", "y-axis")
+                    .style("font-size", `${this.fontSize}px`)
+                    .style("color", "#333")
+                    .call(yAxis);
             }
         }
 
