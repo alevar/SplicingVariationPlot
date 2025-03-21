@@ -10,8 +10,8 @@ import {
     ORFPlot,
     TranscriptomePlot,
     TranscriptomePlotLabels,
-    BarPlot,
     BoxPlot,
+    BarPlot,
     DataPlotArray,
     TriangleConnector
 } from 'sparrowgenomelib';
@@ -358,7 +358,6 @@ export class SplicePlot {
             for (const donor of this.transcriptome.donors()) {
                 donor_positions.push(donor);
             }
-            console.log("donor_positions", donor_positions);
             // sort donor positions
             donor_positions.sort((a, b) => a - b);
             const donor_dataPlotArray = new DataPlotArray({
@@ -389,21 +388,10 @@ export class SplicePlot {
                         fontSize: this.fontSize,
                     };
 
-                    // add background color to the zoomed in plot
-                    donor_zoomPlotSvg.append("rect")
-                        .attr("x", 0)
-                        .attr("y", 0)
-                        .attr("width", donor_zoomPlotDimensions.width)
-                        .attr("height", donor_zoomPlotDimensions.height)
-                        .attr("fill", "#F78154")
-                        .attr("fill-opacity", 0.75);
-
-                    console.log("donor bedfiles", this.bedFiles.donors.data);
-
                     // Extract subset of donor data around the donor position
-                    const windowSize = 5; // ±5 positions around the donor
-                    const donor_range = this.bedFiles.donors.data.getRange(donor - this.zoomWidth, donor + this.zoomWidth);
-                    const full_donor_range = fill_empty_bed_positions(donor_range, donor - this.zoomWidth, donor + this.zoomWidth);
+                    const donor_range = this.bedFiles.donors.data.getRange(donor - this.zoomWidth-2, donor + this.zoomWidth).explode();
+                    const full_donor_range = fill_empty_bed_positions(donor_range, donor - this.zoomWidth-2, donor + this.zoomWidth);
+                    console.log("full_donor_range", donor, full_donor_range);
                     const donorsMaxYScale = computeMaxNonOutlierScore(this.bedFiles.donors.data);
                     const yScale = d3.scaleLinear()
                         .domain([0, donorsMaxYScale])
@@ -411,7 +399,7 @@ export class SplicePlot {
 
                     // Create x scale for the plot
                     const xScale = d3.scaleLinear()
-                        .domain([donor - windowSize, donor + windowSize])
+                        .domain([donor - this.zoomWidth-2, donor + this.zoomWidth])
                         .range([0, donor_zoomPlotDimensions.width]);
 
                     // Create and render the boxplot
@@ -430,6 +418,18 @@ export class SplicePlot {
                     });
 
                     boxPlot.plot();
+
+                    donor_zoomPlotSvg.append("rect")
+                        .attr("class", "grid-background")
+                        .attr("x", 0)
+                        .attr("y", 0)
+                        .attr("width", donor_zoomPlotDimensions.width)
+                        .attr("height", donor_zoomPlotDimensions.height)
+                        .attr("fill", "#F78154")
+                        .attr("fill-opacity", 0.025)
+                        .attr("stroke", "#F78154")
+                        .attr("stroke-width", 2)
+                        .attr("stroke-opacity", 0.75);
 
                     // build connector in the overlay between zoom and original points
                     const donor_spacerSvg = this.grid.getCellSvg(0, 4);
@@ -557,7 +557,6 @@ export class SplicePlot {
             for (const acceptor of this.transcriptome.acceptors()) {
                 acceptor_positions.push(acceptor);
             }
-            console.log("acceptor_positions", acceptor_positions);
             // sort acceptor positions
             acceptor_positions.sort((a, b) => a - b);
             const acceptor_dataPlotArray = new DataPlotArray({
@@ -588,18 +587,10 @@ export class SplicePlot {
                         fontSize: this.fontSize,
                     };
 
-                    // add background color to the zoomed in plot
-                    acceptor_zoomPlotSvg.append("rect")
-                        .attr("x", 0)
-                        .attr("y", 0)
-                        .attr("width", acceptor_zoomPlotDimensions.width)
-                        .attr("height", acceptor_zoomPlotDimensions.height)
-                        .attr("fill", "#5FAD56");
-
                     // Extract subset of SJ data around the acceptor position
-                    const windowSize = 5; // ±5 positions around the donor
-                    const acceptor_range = this.bedFiles.acceptors.data.getRange(acceptor - this.zoomWidth, acceptor + this.zoomWidth).explode();
-                    const full_acceptor_range = fill_empty_bed_positions(acceptor_range, acceptor - this.zoomWidth, acceptor + this.zoomWidth);
+                    const acceptor_range = this.bedFiles.acceptors.data.getRange(acceptor - this.zoomWidth-2, acceptor + this.zoomWidth).explode();
+                    const full_acceptor_range = fill_empty_bed_positions(acceptor_range, acceptor - this.zoomWidth-2, acceptor + this.zoomWidth);
+                    console.log("full_acceptor_range", acceptor, full_acceptor_range);
                     const acceptorsMaxYScale = computeMaxNonOutlierScore(this.bedFiles.acceptors.data);
                     const yScale = d3.scaleLinear()
                         .domain([0, acceptorsMaxYScale])
@@ -607,7 +598,7 @@ export class SplicePlot {
 
                     // Create x scale for the plot
                     const xScale = d3.scaleLinear()
-                        .domain([acceptor - windowSize, acceptor + windowSize])
+                        .domain([acceptor - this.zoomWidth-4, acceptor + this.zoomWidth])
                         .range([0, acceptor_zoomPlotDimensions.width]);
 
                     // Create and render the boxplot
@@ -626,6 +617,18 @@ export class SplicePlot {
                     });
 
                     boxPlot.plot();
+
+                    acceptor_zoomPlotSvg.append("rect")
+                        .attr("class", "grid-background")
+                        .attr("x", 0)
+                        .attr("y", 0)
+                        .attr("width", acceptor_zoomPlotDimensions.width)
+                        .attr("height", acceptor_zoomPlotDimensions.height)
+                        .attr("fill", "#5FAD56")
+                        .attr("fill-opacity", 0.025)
+                        .attr("stroke", "#5FAD56")
+                        .attr("stroke-width", 2)
+                        .attr("stroke-opacity", 0.75);
 
                     // build connector in the overlay between zoom and original points
                     const acceptor_spacerSvg = this.grid.getCellSvg(0, 8);
